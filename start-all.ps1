@@ -91,10 +91,11 @@ $proc2 = Start-Process -FilePath "py" `
     -WorkingDirectory "$root\deepseek-free-api" `
     -PassThru -WindowStyle Hidden
 
-# Start mimo-free-proxy (port 8788)
-Write-Host "  [3/3] mimo-free-proxy on :8788" -ForegroundColor Green
+# Start mimo-free-proxy (port 8788) - requires Tor SOCKS5 to avoid IP ban
+$mimoProxy = " --proxy socks5://127.0.0.1:9150"
+Write-Host "  [3/3] mimo-free-proxy on :8788 (via Tor)" -ForegroundColor Green
 $proc3 = Start-Process -FilePath "python" `
-    -ArgumentList "server.py --port 8788 --host 127.0.0.1$proxyArg" `
+    -ArgumentList "server.py --port 8788 --host 127.0.0.1$mimoProxy" `
     -WorkingDirectory "$root\mimo-free-proxy" `
     -PassThru -WindowStyle Hidden
 
