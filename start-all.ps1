@@ -7,7 +7,66 @@ $proxy = $null
 
 $proxyArg = if ($proxy) { " --proxy $proxy" } else { "" }
 
-Write-Host "Starting proxy servers..." -ForegroundColor Cyan
+function Test-Port($port) {
+    $conn = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
+    return $null -ne $conn
+}
+
+function Get-ProcessOnPort($port) {
+    $conn = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
+    if ($conn) {
+        $pid = $conn[0].OwningProcess
+        return Get-Process -Id $pid -ErrorAction SilentlyContinue
+    }
+    return $null
+}
+
+function Stop-PortOwner($port, $name) {
+    $proc = Get-ProcessOnPort $port
+    if ($proc) {
+        Write-Host "    Port $port is used by PID $($proc.Id) ($($proc.Name))" -ForegroundColor Yellow
+        $confirm = Read-Host "    Kill it? (y/N)"
+        if ($confirm -eq "y" -or $confirm -eq "Y") {
+            Stop-Process -Id $proc.Id -Force
+            Start-Sleep -Milliseconds 500
+            Write-Host "    Killed." -ForegroundColor Green
+            return $true
+        } else {
+            Write-Host "    Skipping $name." -ForegroundColor Red
+            return $false
+        }
+    }
+    return $true
+}
+
+Write-Host "Checking ports..." -ForegroundColor Cyan
+
+$ports = @(6446, 18632, 8788, 8080)
+$blocked = @()
+foreach ($port in $ports) {
+    if (Test-Port $port) {
+        $proc = Get-ProcessOnPort $port
+        $info = if ($proc) { "PID $($proc.Id) ($($proc.Name))" } else { "unknown" }
+        Write-Host "  :$port - OCCUPIED by $info" -ForegroundColor Yellow
+        $blocked += $port
+    } else {
+        Write-Host "  :$port - free" -ForegroundColor DarkGray
+    }
+}
+
+if ($blocked.Count -gt 0) {
+    Write-Host "`nSome ports are occupied." -ForegroundColor Yellow
+    $answer = Read-Host "Kill occupied processes and continue? (y/N)"
+    if ($answer -ne "y" -and $answer -ne "Y") {
+        Write-Host "Aborted." -ForegroundColor Red
+        exit 1
+    }
+    foreach ($port in $blocked) {
+        Stop-PortOwner $port ""
+    }
+}
+
+Write-Host "`nStarting proxy servers..." -ForegroundColor Cyan
 
 # Start opencode-free-proxy (port 6446)
 Write-Host "  [1/3] opencode-free-proxy on :6446" -ForegroundColor Green
@@ -43,11 +102,6 @@ Write-Host "`nWaiting for servers to start..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
 
 # Check which ports are listening
-function Test-Port($port) {
-    $conn = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
-    return $null -ne $conn
-}
-
 $running = @()
 $failed = @()
 if (Test-Port 6446) { $running += "opencode-free-proxy" } else { $failed += "opencode-free-proxy" }
