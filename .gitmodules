@@ -1,0 +1,9 @@
+[submodule "opencode-free-proxy"]
+	path = opencode-free-proxy
+	url = git@github.com:mmkeeper/opencode-free-proxy.git
+[submodule "deepseek-free-api"]
+	path = deepseek-free-api
+	url = git@github.com:mmkeeper/deepseek-free-api.git
+[submodule "mimo-free-proxy"]
+	path = mimo-free-proxy
+	url = git@github.com:mmkeeper/mimo-free-proxy.git

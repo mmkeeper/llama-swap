@@ -1,0 +1,4 @@
+[*] Using SOCKS5 proxy: 127.0.0.1:9150
+[01:59:23] JWT refreshed, exp in 3599s
+[01:59:23] startup JWT ok
+[01:59:23] MiMo Free Proxy on http://127.0.0.1:8788 auth=ON
