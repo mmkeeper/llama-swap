@@ -15,8 +15,8 @@ function Test-Port($port) {
 function Get-ProcessOnPort($port) {
     $conn = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
     if ($conn) {
-        $pid = $conn[0].OwningProcess
-        return Get-Process -Id $pid -ErrorAction SilentlyContinue
+        $ownerPid = $conn[0].OwningProcess
+        return Get-Process -Id $ownerPid -ErrorAction SilentlyContinue
     }
     return $null
 }
