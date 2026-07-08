@@ -3,54 +3,23 @@ logTimeFormat: rfc3339
 healthCheckTimeout: 15
 sendLoadingState: true
 
-models:
-  # === opencode-free-proxy (port 6446) ===
-  mimo-v2.5-free:
+peers:
+  opencode:
     proxy: http://127.0.0.1:6446
-    checkEndpoint: none
-    name: "MiMo v2.5 Free"
-    description: "MiMo v2.5 via opencode-free-proxy"
+    models:
+      - mimo-v2.5-free
+      - deepseek-v4-flash-free
+      - north-mini-code-free
+      - nemotron-3-ultra-free
+      - big-pickle
 
-  deepseek-v4-flash-free:
-    proxy: http://127.0.0.1:6446
-    checkEndpoint: none
-    name: "DeepSeek V4 Flash Free"
-    description: "DeepSeek V4 Flash via opencode-free-proxy"
-
-  north-mini-code-free:
-    proxy: http://127.0.0.1:6446
-    checkEndpoint: none
-    name: "North Mini Code Free"
-    description: "North Mini Code via opencode-free-proxy"
-
-  nemotron-3-ultra-free:
-    proxy: http://127.0.0.1:6446
-    checkEndpoint: none
-    name: "Nemotron 3 Ultra Free"
-    description: "Nemotron 3 Ultra via opencode-free-proxy"
-
-  big-pickle:
-    proxy: http://127.0.0.1:6446
-    checkEndpoint: none
-    name: "Big Pickle"
-    description: "Big Pickle via opencode-free-proxy"
-
-  # === deepseek-free-api (port 18632) ===
-  deepseek-chat:
+  deepseek:
     proxy: http://127.0.0.1:18632
-    checkEndpoint: none
-    name: "DeepSeek Chat"
-    description: "DeepSeek V3/V4 via deepseek-free-api"
+    models:
+      - deepseek-chat
+      - deepseek-reasoner
 
-  deepseek-reasoner:
-    proxy: http://127.0.0.1:18632
-    checkEndpoint: none
-    name: "DeepSeek Reasoner"
-    description: "DeepSeek R1 via deepseek-free-api"
-
-  # === mimo-free-proxy (port 8788) ===
-  mimo-auto:
+  mimo:
     proxy: http://127.0.0.1:8788?key=sk-mimo-keeper-unique-key
-    checkEndpoint: none
-    name: "MiMo Auto"
-    description: "MiMo via mimo-free-proxy"
+    models:
+      - mimo-auto
