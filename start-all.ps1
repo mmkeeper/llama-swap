@@ -3,7 +3,7 @@
 
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
-$proxy = "socks5://127.0.0.1:9150"
+$proxy = $null
 
 $proxyArg = if ($proxy) { " --proxy $proxy" } else { "" }
 
