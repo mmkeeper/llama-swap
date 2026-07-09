@@ -3,9 +3,16 @@
 
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
-$proxy = $null
 
-$proxyArg = if ($proxy) { " --proxy $proxy" } else { "" }
+# ── Proxy settings ───────────────────────────────────────────────
+$useProxyOpencode  = $false
+$useProxyDeepseek  = $false
+$useProxyMimo      = $true
+$socks5Proxy       = "socks5://127.0.0.1:9150"
+
+function Get-ProxyArg($enabled) {
+    if ($enabled) { " --proxy $socks5Proxy" } else { "" }
+}
 
 function Test-Port($port) {
     $conn = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
@@ -69,15 +76,19 @@ if ($blocked.Count -gt 0) {
 Write-Host "`nStarting proxy servers..." -ForegroundColor Cyan
 
 # Start opencode-free-proxy (port 6446)
-Write-Host "  [1/3] opencode-free-proxy on :6446" -ForegroundColor Green
+$ocProxyArg = Get-ProxyArg $useProxyOpencode
+$ocProxyInfo = if ($useProxyOpencode) { " (via proxy)" } else { "" }
+Write-Host "  [1/3] opencode-free-proxy on :6446$ocProxyInfo" -ForegroundColor Green
 $proc1 = Start-Process -FilePath "python" `
-    -ArgumentList "server.py --port 6446 --host 127.0.0.1$proxyArg" `
+    -ArgumentList "server.py --port 6446 --host 127.0.0.1$ocProxyArg" `
     -WorkingDirectory "$root\opencode-free-proxy" `
     -PassThru -WindowStyle Hidden
 
 # Start deepseek-free-api (port 18632) - requires Python 3.10 for wasmer
+$dsProxyArg = Get-ProxyArg $useProxyDeepseek
+$dsProxyInfo = if ($useProxyDeepseek) { " (via proxy)" } else { "" }
 $dsPython = "py -3.10"
-Write-Host "  [2/3] deepseek-free-api on :18632" -ForegroundColor Green
+Write-Host "  [2/3] deepseek-free-api on :18632$dsProxyInfo" -ForegroundColor Green
 $dsAuthFile = "$env:USERPROFILE\.deepseek-free-api\auth.json"
 if (-not (Test-Path $dsAuthFile)) {
     Write-Host "    Auth not found. Starting login..." -ForegroundColor Yellow
@@ -87,15 +98,16 @@ if (-not (Test-Path $dsAuthFile)) {
     Pop-Location
 }
 $proc2 = Start-Process -FilePath "py" `
-    -ArgumentList "-3.10 server.py --port 18632 --host 127.0.0.1$proxyArg" `
+    -ArgumentList "-3.10 server.py --port 18632 --host 127.0.0.1$dsProxyArg" `
     -WorkingDirectory "$root\deepseek-free-api" `
     -PassThru -WindowStyle Hidden
 
-# Start mimo-free-proxy (port 8788) - requires Tor SOCKS5 to avoid IP ban
-$mimoProxy = " --proxy socks5://127.0.0.1:9150"
-Write-Host "  [3/3] mimo-free-proxy on :8788 (via Tor)" -ForegroundColor Green
+# Start mimo-free-proxy (port 8788)
+$mmProxyArg = Get-ProxyArg $useProxyMimo
+$mmProxyInfo = if ($useProxyMimo) { " (via proxy)" } else { "" }
+Write-Host "  [3/3] mimo-free-proxy on :8788$mmProxyInfo" -ForegroundColor Green
 $proc3 = Start-Process -FilePath "python" `
-    -ArgumentList "server.py --port 8788 --host 127.0.0.1$mimoProxy" `
+    -ArgumentList "server.py --port 8788 --host 127.0.0.1$mmProxyArg" `
     -WorkingDirectory "$root\mimo-free-proxy" `
     -RedirectStandardError "$root\mimo-free-proxy\server.err" `
     -PassThru -WindowStyle Hidden
