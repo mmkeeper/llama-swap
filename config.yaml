@@ -16,10 +16,10 @@ peers:
   deepseek:
     proxy: http://127.0.0.1:18632
     models:
-      - deepseek-chat
-      - deepseek-reasoner
+      - dsf-deepseek-chat
+      - dsf-deepseek-reasoner
 
   mimo:
     proxy: http://127.0.0.1:8788?key=sk-mimo-keeper-unique-key
     models:
-      - mimo-auto
+      - mcf-mimo-auto
