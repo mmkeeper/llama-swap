@@ -18,6 +18,7 @@ peers:
     models:
       - dsf-deepseek-chat
       - dsf-deepseek-reasoner
+      - dsf-deepseek-vision
 
   mimo:
     proxy: http://127.0.0.1:8788?key=sk-mimo-keeper-unique-key
