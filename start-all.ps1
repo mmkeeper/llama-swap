@@ -98,8 +98,9 @@ if (-not (Test-Path $dsAuthFile)) {
     Pop-Location
 }
 $proc2 = Start-Process -FilePath "py" `
-    -ArgumentList "-3.10 server.py --port 18632 --host 127.0.0.1$dsProxyArg" `
+    -ArgumentList "-3.10 server.py --port 18632 --host 127.0.0.1 --debug$dsProxyArg" `
     -WorkingDirectory "$root\deepseek-free-api" `
+    -RedirectStandardError "$root\deepseek-free-api\logs\server.err" `
     -PassThru -WindowStyle Hidden
 
 # Start mimo-free-proxy (port 8788)
