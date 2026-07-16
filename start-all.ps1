@@ -84,21 +84,20 @@ $proc1 = Start-Process -FilePath "python" `
     -WorkingDirectory "$root\opencode-free-proxy" `
     -PassThru -WindowStyle Hidden
 
-# Start deepseek-free-api (port 18632) - requires Python 3.10 for wasmer
+# Start deepseek-free-api (port 18632)
 $dsProxyArg = Get-ProxyArg $useProxyDeepseek
 $dsProxyInfo = if ($useProxyDeepseek) { " (via proxy)" } else { "" }
-$dsPython = "py -3.10"
 Write-Host "  [2/3] deepseek-free-api on :18632$dsProxyInfo" -ForegroundColor Green
 $dsAuthFile = "$env:USERPROFILE\.deepseek-free-api\auth.json"
 if (-not (Test-Path $dsAuthFile)) {
     Write-Host "    Auth not found. Starting login..." -ForegroundColor Yellow
     Write-Host "    A browser window will open. Log in to DeepSeek." -ForegroundColor Yellow
     Push-Location "$root\deepseek-free-api"
-    & py -3.10 server.py --login
+    & python server.py --login
     Pop-Location
 }
-$proc2 = Start-Process -FilePath "py" `
-    -ArgumentList "-3.10 server.py --port 18632 --host 127.0.0.1 --debug $dsProxyArg" `
+$proc2 = Start-Process -FilePath "python" `
+    -ArgumentList "server.py --port 18632 --host 127.0.0.1 --debug $dsProxyArg" `
     -WorkingDirectory "$root\deepseek-free-api" `
     -RedirectStandardError "$root\deepseek-free-api\logs\server.err" `
     -PassThru -WindowStyle Hidden
