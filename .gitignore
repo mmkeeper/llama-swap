@@ -3,6 +3,8 @@
 build/
 dist/
 .vscode
+.idea/
+.opencode/
 .DS_Store
 .dev/
 *.log

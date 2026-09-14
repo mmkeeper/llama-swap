@@ -97,7 +97,7 @@ if (-not (Test-Path $dsAuthFile)) {
     Pop-Location
 }
 $proc2 = Start-Process -FilePath "python" `
-    -ArgumentList "server.py --port 18632 --host 127.0.0.1 --debug $dsProxyArg" `
+    -ArgumentList "server.py --port 18632 --host 127.0.0.1 --debug --no-search $dsProxyArg" `
     -WorkingDirectory "$root\deepseek-free-api" `
     -RedirectStandardError "$root\deepseek-free-api\logs\server.err" `
     -PassThru -WindowStyle Hidden
