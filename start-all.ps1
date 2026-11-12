@@ -5,10 +5,10 @@ $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 
 # ── Proxy settings ───────────────────────────────────────────────
-$useProxyOpencode  = $false
-$useProxyDeepseek  = $false
+$useProxyOpencode  = $true
+$useProxyDeepseek  = $true
 $useProxyMimo      = $true
-$socks5Proxy       = "socks5://127.0.0.1:9150"
+$socks5Proxy       = "socks5://127.0.0.1:10808"
 
 function Get-ProxyArg($enabled) {
     if ($enabled) { " --proxy $socks5Proxy" } else { "" }
@@ -96,6 +96,7 @@ if (-not (Test-Path $dsAuthFile)) {
     & python server.py --login
     Pop-Location
 }
+#--debug
 $proc2 = Start-Process -FilePath "python" `
     -ArgumentList "server.py --port 18632 --host 127.0.0.1 --debug --no-search $dsProxyArg" `
     -WorkingDirectory "$root\deepseek-free-api" `
