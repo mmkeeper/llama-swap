@@ -87,20 +87,18 @@ $proc1 = Start-Process -FilePath "python" `
 # Start deepseek-free-api (port 18632)
 $dsProxyArg = Get-ProxyArg $useProxyDeepseek
 $dsProxyInfo = if ($useProxyDeepseek) { " (via proxy)" } else { "" }
-Write-Host "  [2/3] deepseek-free-api on :18632$dsProxyInfo" -ForegroundColor Green
-$dsAuthFile = "$env:USERPROFILE\.deepseek-free-api\auth.json"
-if (-not (Test-Path $dsAuthFile)) {
-    Write-Host "    Auth not found. Starting login..." -ForegroundColor Yellow
-    Write-Host "    A browser window will open. Log in to DeepSeek." -ForegroundColor Yellow
-    Push-Location "$root\deepseek-free-api"
-    & python server.py --login
-    Pop-Location
-}
+$dsProfiles = 2
+$dsRoot = "$root\deepseek-free-api"
+Write-Host "  [2/3] deepseek-free-api on :18632$dsProxyInfo ($dsProfiles profiles)" -ForegroundColor Green
+# The server handles login itself: for every profile it reuses saved auth,
+# migrates legacy ~/.deepseek-free-api once, or opens the browser login window
+# when the token is missing/expired. No preflight auth check is needed here.
+New-Item -ItemType Directory -Force -Path "$dsRoot\logs" | Out-Null
 #--debug
 $proc2 = Start-Process -FilePath "python" `
-    -ArgumentList "server.py --port 18632 --host 127.0.0.1 --debug --no-search $dsProxyArg" `
-    -WorkingDirectory "$root\deepseek-free-api" `
-    -RedirectStandardError "$root\deepseek-free-api\logs\server.err" `
+    -ArgumentList "server.py --port 18632 --host 127.0.0.1 --debug --profiles $dsProfiles --no-search $dsProxyArg" `
+    -WorkingDirectory $dsRoot `
+    -RedirectStandardError "$dsRoot\logs\server.err" `
     -PassThru -WindowStyle Hidden
 
 # Start mimo-free-proxy (port 8788)
@@ -125,7 +123,7 @@ if (Test-Port 8788) { $running += "mimo-free-proxy" } else { $failed += "mimo-fr
 
 if ($failed.Count -gt 0) {
     Write-Host "WARNING: Failed to start: $($failed -join ', ')" -ForegroundColor Red
-    Write-Host "Check logs in $root\*.log and $root\*.err" -ForegroundColor Yellow
+    Write-Host "DeepSeek logs: $dsRoot\profiles\profileNN\profile.log, stderr: $dsRoot\logs\server.err" -ForegroundColor Yellow
 }
 
 Write-Host "Running: $($running -join ', ')" -ForegroundColor Green
