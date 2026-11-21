@@ -87,7 +87,7 @@ $proc1 = Start-Process -FilePath "$python" `
 # Start deepseek-free-api (port 18632)
 $dsProxyArg = Get-ProxyArg $useProxyDeepseek
 $dsProxyInfo = if ($useProxyDeepseek) { " (via proxy)" } else { "" }
-$dsProfiles = 2
+$dsProfiles = 3
 $dsRoot = "$root\deepseek-free-api"
 Write-Host "  [2/3] deepseek-free-api on :18632$dsProxyInfo ($dsProfiles profiles)" -ForegroundColor Green
 # The server handles login itself: for every profile it reuses saved auth,
