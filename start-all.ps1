@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 # Start all proxy servers and llama-swap
-
+$python = "C:\Users\keeper\AppData\Local\hermes\hermes-agent\venv\Scripts\python.exe"
 $ErrorActionPreference = "Stop"
 $root = $PSScriptRoot
 
@@ -79,7 +79,7 @@ Write-Host "`nStarting proxy servers..." -ForegroundColor Cyan
 $ocProxyArg = Get-ProxyArg $useProxyOpencode
 $ocProxyInfo = if ($useProxyOpencode) { " (via proxy)" } else { "" }
 Write-Host "  [1/3] opencode-free-proxy on :6446$ocProxyInfo" -ForegroundColor Green
-$proc1 = Start-Process -FilePath "python" `
+$proc1 = Start-Process -FilePath "$python" `
     -ArgumentList "server.py --port 6446 --host 127.0.0.1$ocProxyArg" `
     -WorkingDirectory "$root\opencode-free-proxy" `
     -PassThru -WindowStyle Hidden
@@ -95,7 +95,7 @@ Write-Host "  [2/3] deepseek-free-api on :18632$dsProxyInfo ($dsProfiles profile
 # when the token is missing/expired. No preflight auth check is needed here.
 New-Item -ItemType Directory -Force -Path "$dsRoot\logs" | Out-Null
 #--debug
-$proc2 = Start-Process -FilePath "python" `
+$proc2 = Start-Process -FilePath "$python" `
     -ArgumentList "server.py --port 18632 --host 127.0.0.1 --debug --profiles $dsProfiles --no-search $dsProxyArg" `
     -WorkingDirectory $dsRoot `
     -RedirectStandardError "$dsRoot\logs\server.err" `
@@ -105,7 +105,7 @@ $proc2 = Start-Process -FilePath "python" `
 $mmProxyArg = Get-ProxyArg $useProxyMimo
 $mmProxyInfo = if ($useProxyMimo) { " (via proxy)" } else { "" }
 Write-Host "  [3/3] mimo-free-proxy on :8788$mmProxyInfo" -ForegroundColor Green
-$proc3 = Start-Process -FilePath "python" `
+$proc3 = Start-Process -FilePath "$python" `
     -ArgumentList "server.py --port 8788 --host 127.0.0.1$mmProxyArg" `
     -WorkingDirectory "$root\mimo-free-proxy" `
     -RedirectStandardError "$root\mimo-free-proxy\server.err" `
